@@ -1,3 +1,4 @@
+import FreqNode
 letterCode={'e':00000
 ,'x':000010000
 ,'z':000010001
@@ -26,5 +27,35 @@ letterCode={'e':00000
 ,'t':111
 }
 
+#sampleNum = 923903290329803428904
+sampleNum = 0x9329048904308932489fde
 
-#genEncoding()
+hTree = FreqNode.genEncoding()
+##sampleBinary = "".join(format(ord(x), 'b') for x in sampleNum)
+binStr ='{0:08b}'.format(sampleNum)
+def getChar(binaryStr, hTree):
+    if len(binaryStr)==0:
+        return ('!',"")
+    if(binaryStr[0]=='0'):
+        print "left"
+        nextTree = hTree.left
+        if(nextTree.letter!='!'):
+            return (nextTree.letter, binaryStr)
+        return getChar(binaryStr[1::], nextTree)
+    if(binaryStr[0]=='1'):
+        print "right"
+        nextTree = hTree.right
+        if(nextTree.letter!='!'):
+            return (nextTree.letter, binaryStr)
+        return getChar(binaryStr[1::], nextTree)
+print binStr
+
+outStr = ""
+while 1:
+    (c, binStr)= getChar(binStr, hTree)
+    outStr+=c
+    if(c=='!'):
+        break
+print outStr
+
+#for i in range(0,len(sampleBinary)):

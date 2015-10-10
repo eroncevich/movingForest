@@ -3,6 +3,7 @@ import FreqNode
 import sys
 from Crypto.Cipher import AES
 import binascii
+import random
 
 letterCode={'e':00000
 ,'x':000010000
@@ -70,11 +71,18 @@ hTree = FreqNode.genEncoding()
 #binStr ='{0:08b}'.format(sampleNum)
 def getChar(binaryStr, hTree):
     if len(binaryStr)==0:
-        return ('!',"")
+        nextTree = hTree.left
+        #print nextTree, nextTree.left
+        if(nextTree.letter!='!'):
+            #print "yo"
+            return (nextTree.letter, "")
+        return getChar("", nextTree)
     if(binaryStr[0]=='0'):
         #print "left"
         nextTree = hTree.left
+        #print nextTree, nextTree.left
         if(nextTree.letter!='!'):
+            #print "yo"
             return (nextTree.letter, binaryStr)
         return getChar(binaryStr[1::], nextTree)
     if(binaryStr[0]=='1'):
@@ -86,9 +94,109 @@ def getChar(binaryStr, hTree):
 print binStr, len(binStr)
 
 outStr = ""
+binStr+="1"
 while 1:
     (c, binStr)= getChar(binStr, hTree)
+    #print binStr
     outStr+=c
-    if(c=='!'):
+    if(not binStr):
         break
 print outStr
+
+nounList = {}
+adjList = {}
+verbList = {}
+def getWordList():
+    for line in file("nouns.csv"):
+        elem = line.split()[0].lower()
+        if not nounList.has_key(elem[0]):
+            nounList[elem[0]] = [elem]
+        else:
+            nounList[elem[0]].append(elem)
+    for line in file("adjectives.csv"):
+        elem = line.split()[0].lower()
+        if not adjList.has_key(elem[0]):
+            adjList[elem[0]] = [elem]
+        else:
+            adjList[elem[0]].append(elem)
+    for line in file("ShakespeareWords-verbs.csv"):
+        elem = line.split()[0].lower()
+        if not verbList.has_key(elem[0]):
+            verbList[elem[0]] = [elem]
+        else:
+            verbList[elem[0]].append(elem)
+
+            
+
+getWordList()
+random.seed()
+#paragraph = ""
+
+def NANVV1(firstLetters):
+    (l0,l1,l2,l3,l4)= firstLetters[0], firstLetters[1],firstLetters[2],firstLetters[3],firstLetters[4]
+    w0 = random.choice(nounList[l0])
+    w1 = random.choice(adjList[l1])
+    w2 = random.choice(nounList[l2])
+    w3 = random.choice(verbList[l3])
+    w4 = random.choice(verbList[l4])
+    #print "The %s, being a %s %s, %s and %s." %(w0, w1, w2,w3,w4)
+    return "The %s, being a %s %s, %s and %s." %(w0, w1, w2,w3,w4)
+def AAN1(firstLetters):
+    (l0,l1,l2)= firstLetters[0], firstLetters[1],firstLetters[2]
+    w0 = random.choice(adjList[l0])
+    w1 = random.choice(adjList[l1])
+    w2 = random.choice(nounList[l2])
+    #print "You %s, %s %s." %(w0, w1, w2)
+    return "You %s, %s %s." %(w0, w1, w2)
+def NVAN1(firstLetters):
+    (l0,l1,l2,l3)= firstLetters[0], firstLetters[1],firstLetters[2],firstLetters[3]
+    w0 = random.choice(nounList[l0])
+    w1 = random.choice(verbList[l1])
+    w2 = random.choice(adjList[l2])
+    w3 = random.choice(nounList[l3])
+    #print "The %s %s a %s %s." %(w0, w1, w2,w3)
+    return "The %s %s a %s %s." %(w0, w1, w2,w3)
+def VAN1(firstLetters):
+    (l0,l1,l2)= firstLetters[0], firstLetters[1],firstLetters[2]
+    w0 = random.choice(verbList[l0])
+    w1 = random.choice(adjList[l1])
+    w2 = random.choice(nounList[l2])
+    #print "It %s, a %s %s." %(w0, w1, w2)
+    return "It %s, a %s %s." %(w0, w1, w2)
+def NV1(firstLetters):
+    (l0,l1)= firstLetters[0], firstLetters[1]
+    w0 = random.choice(nounList[l0])
+    w1 = random.choice(verbList[l1])
+    #print "The %s %s." %(w0, w1)
+    return "The %s %s." %(w0, w1)
+def N1(firstLetters):
+    (l0)= firstLetters[0]
+    w0 = random.choice(verbList[l0])
+    #print "Says the %s." %(w0)
+    return "Says the %s." %(w0)
+
+def getOutput(firstLetters ):
+    paragraph=""
+    grammarStructs = {NANVV1:5, NVAN1:4,AAN1:3,VAN1:3,NV1:2, N1:1}
+
+    while firstLetters:
+        wordsLeft = len(firstLetters)
+        possibleStructs = []
+        for struct in grammarStructs.items():
+            if wordsLeft<=2 and struct[1]<=wordsLeft:
+                possibleStructs.append(struct[0])
+            elif struct[1]<=wordsLeft and struct[1]>2:
+                possibleStructs.append(struct[0])
+        randomStruct = random.choice(possibleStructs)
+        #print randomStruct
+        paragraph+=randomStruct(firstLetters)+" "
+        firstLetters= firstLetters[grammarStructs[randomStruct]::]
+    return paragraph
+            
+
+
+print getOutput(outStr)
+#print nounList
+#print adjList
+#print verbList
+#print paragraph

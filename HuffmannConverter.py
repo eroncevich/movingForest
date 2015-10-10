@@ -4,54 +4,55 @@ import sys
 from Crypto.Cipher import AES
 import binascii
 import random
+import re
 
-letterCode={'e':00000
-,'x':000010000
-,'z':000010001
-,'q':00001001
-,'k':0000101
-,'j':0000110
-,'v':0000111
-,'m':0001
-,'b':0010
-,'n':00110
-,'p':00111
-,'a':010
-,'d':01100
-,'l':01101
-,'o':0111
-,'i':1000
-,'u':100100
-,'y':100101
-,'c':10011
-,'w':1010
-,'h':1011
-,'r':110000
-,'g':110001
-,'f':11001
-,'s':1101
-,'t':111
+letterCode={'e':'00000'
+,'x':'000010000'
+,'z':'000010001'
+,'q':'00001001'
+,'k':'0000101'
+,'j':'0000110'
+,'v':'0000111'
+,'m':'0001'
+,'b':'0010'
+,'n':'00110'
+,'p':'00111'
+,'a':'010'
+,'d':'01100'
+,'l':'01101'
+,'o':'0111'
+,'i':'1000'
+,'u':'100100'
+,'y':'100101'
+,'c':'10011'
+,'w':'1010'
+,'h':'1011'
+,'r':'110000'
+,'g':'110001'
+,'f':'11001'
+,'s':'1101'
+,'t':'111'
 }
 if len(sys.argv)<2:
     print "Error input missing"
     print "python HuffmanConverter.py [input]"
     exit()
 pt = file(sys.argv[1]).read()
-print "Plaintext", pt
-print "Pt Hex", pt.encode('hex')
+print "Plaintext:", pt
+#print "Pt Hex", pt.encode('hex')
  
 key = 'ihavespecialeyes'
 pt+= "1"
 while(len(pt)%16 !=0):
     pt+="0"
-print pt
- 
+
 encobj = AES.new(key, AES.MODE_ECB)
 ct = encobj.encrypt(pt)
 #print "len", len(ct)
 #print ct
 
-print "CipherText",ct.encode('hex')
+print "CipherText:",ct.encode('hex')
+print "\n\n\n"
 ctLen = len(ct)*8;
 #print ctLen
 
@@ -83,25 +84,26 @@ def getChar(binaryStr, hTree):
         #print nextTree, nextTree.left
         if(nextTree.letter!='!'):
             #print "yo"
-            return (nextTree.letter, binaryStr)
+            return (nextTree.letter, binaryStr[1::])
         return getChar(binaryStr[1::], nextTree)
     if(binaryStr[0]=='1'):
         #print "right"
         nextTree = hTree.right
         if(nextTree.letter!='!'):
-            return (nextTree.letter, binaryStr)
+            return (nextTree.letter, binaryStr[1::])
         return getChar(binaryStr[1::], nextTree)
-print binStr, len(binStr)
+#print binStr, len(binStr)
 
 outStr = ""
 binStr+="1"
 while 1:
+    #print binStr
     (c, binStr)= getChar(binStr, hTree)
     #print binStr
     outStr+=c
     if(not binStr):
         break
-print outStr
+#print outStr
 
 nounList = {}
 adjList = {}
@@ -131,7 +133,17 @@ def getWordList():
 getWordList()
 random.seed()
 #paragraph = ""
-
+def NVANVAN(firstLetters):
+    (l0,l1,l2,l3,l4,l5,l6)= firstLetters[0], firstLetters[1],firstLetters[2],firstLetters[3],firstLetters[4],firstLetters[5],firstLetters[6]
+    w0 = random.choice(nounList[l0])
+    w1 = random.choice(verbList[l1])
+    w2 = random.choice(adjList[l2])
+    w3 = random.choice(nounList[l3])
+    w4 = random.choice(verbList[l4])
+    w5 = random.choice(adjList[l5])
+    w6 = random.choice(nounList[l6])
+    print "When %s %s, a %s %s doth %s the %s %s." %(w0, w1, w2,w3,w4,w5,w6)
+    return "When %s %s, a %s %s doth %s the %s %s." %(w0, w1, w2,w3,w4,w5,w6)
 def NANVV1(firstLetters):
     (l0,l1,l2,l3,l4)= firstLetters[0], firstLetters[1],firstLetters[2],firstLetters[3],firstLetters[4]
     w0 = random.choice(nounList[l0])
@@ -139,45 +151,45 @@ def NANVV1(firstLetters):
     w2 = random.choice(nounList[l2])
     w3 = random.choice(verbList[l3])
     w4 = random.choice(verbList[l4])
-    #print "The %s, being a %s %s, %s and %s." %(w0, w1, w2,w3,w4)
+    print "The %s, being a %s %s, %s and %s." %(w0, w1, w2,w3,w4)
     return "The %s, being a %s %s, %s and %s." %(w0, w1, w2,w3,w4)
 def AAN1(firstLetters):
     (l0,l1,l2)= firstLetters[0], firstLetters[1],firstLetters[2]
     w0 = random.choice(adjList[l0])
     w1 = random.choice(adjList[l1])
     w2 = random.choice(nounList[l2])
-    #print "You %s, %s %s." %(w0, w1, w2)
-    return "You %s, %s %s." %(w0, w1, w2)
+    print "A %s, %s %s." %(w0, w1, w2)
+    return "A %s, %s %s." %(w0, w1, w2)
 def NVAN1(firstLetters):
     (l0,l1,l2,l3)= firstLetters[0], firstLetters[1],firstLetters[2],firstLetters[3]
     w0 = random.choice(nounList[l0])
     w1 = random.choice(verbList[l1])
     w2 = random.choice(adjList[l2])
     w3 = random.choice(nounList[l3])
-    #print "The %s %s a %s %s." %(w0, w1, w2,w3)
+    print "The %s %s a %s %s." %(w0, w1, w2,w3)
     return "The %s %s a %s %s." %(w0, w1, w2,w3)
 def VAN1(firstLetters):
     (l0,l1,l2)= firstLetters[0], firstLetters[1],firstLetters[2]
     w0 = random.choice(verbList[l0])
     w1 = random.choice(adjList[l1])
     w2 = random.choice(nounList[l2])
-    #print "It %s, a %s %s." %(w0, w1, w2)
+    print "It %s, a %s %s." %(w0, w1, w2)
     return "It %s, a %s %s." %(w0, w1, w2)
 def NV1(firstLetters):
     (l0,l1)= firstLetters[0], firstLetters[1]
     w0 = random.choice(nounList[l0])
     w1 = random.choice(verbList[l1])
-    #print "The %s %s." %(w0, w1)
+    print "The %s %s." %(w0, w1)
     return "The %s %s." %(w0, w1)
 def N1(firstLetters):
     (l0)= firstLetters[0]
     w0 = random.choice(verbList[l0])
-    #print "Says the %s." %(w0)
+    print "Says the %s." %(w0)
     return "Says the %s." %(w0)
 
 def getOutput(firstLetters ):
     paragraph=""
-    grammarStructs = {NANVV1:5, NVAN1:4,AAN1:3,VAN1:3,NV1:2, N1:1}
+    grammarStructs = {NVANVAN:7,NANVV1:5, NVAN1:4,AAN1:3,VAN1:3,NV1:2, N1:1}
 
     while firstLetters:
         wordsLeft = len(firstLetters)
@@ -188,14 +200,86 @@ def getOutput(firstLetters ):
             elif struct[1]<=wordsLeft and struct[1]>2:
                 possibleStructs.append(struct[0])
         randomStruct = random.choice(possibleStructs)
-        #print randomStruct
         paragraph+=randomStruct(firstLetters)+" "
         firstLetters= firstLetters[grammarStructs[randomStruct]::]
     return paragraph
             
 
 
-print getOutput(outStr)
+paragraph= getOutput(outStr)
+print "\n\n\n"
+#print paragraph
+
+def reverseParagraph(paragraph):
+    lines = paragraph.split(".")
+    firstChars = ""
+    for line in lines:
+        m = re.search('When .* .*, a .* .* doth', line)
+        if m:
+            words = line.split()
+            (l0,l1,l2,l3,l4,l5,l6) = words[1],words[2],words[4],words[5],words[7],words[9],words[10]
+            firstChars+= l0[0]+l1[0]+l2[0]+l3[0]+l4[0]+l5[0]+l6[0]
+            continue
+        m = re.search('The .* being a .*,', line)
+        if m:
+            words = line.split()
+            (l0,l1,l2,l3,l4) = words[1],words[4],words[5],words[6],words[8]
+            firstChars+= l0[0]+l1[0]+l2[0]+l3[0]+l4[0]
+            continue
+        m = re.search('The .* .* a .* .*', line)
+        if m:
+            words = line.split()
+            (l0,l1,l2,l3) = words[1],words[2],words[4],words[5]
+            firstChars+= l0[0]+l1[0]+l2[0]+l3[0]
+            continue
+        m = re.search('A .*, .* .*', line)
+        if m:
+            words = line.split()
+            (l0,l1,l2) = words[1],words[2],words[3]
+            firstChars+= l0[0]+l1[0]+l2[0]
+            continue
+        m = re.search('It .*, a .* .*', line)
+        if m:
+            words = line.split()
+            (l0,l1,l2) = words[1],words[3],words[4]
+            firstChars+= l0[0]+l1[0]+l2[0]
+            continue
+        m = re.search('The .* .*', line)
+        if m:
+            words = line.split()
+            (l0,l1) = words[1],words[2]
+            firstChars+= l0[0]+l1[0]
+            continue
+        m = re.search('Says the .*', line)
+        if m:
+            words = line.split()
+            l0 = words[2]
+            firstChars+= l0[0]
+            continue
+    return firstChars
+
+
+firstChars =reverseParagraph(paragraph)
+#print firstChars
+
+def reverseHuffmann(firstChars):
+    binStr = ""
+    for c in firstChars:
+        binStr+=str(letterCode[c])
+    return binStr[0:[m.start(0) for m in re.finditer("10*$", binStr)][0]]
+
+
+binStr = reverseHuffmann(firstChars)
+ct = hex(int(binStr,2))
+ct = ct[2:len(ct)-1]
+print "Decrypted CipherText:", ct,"\n\n"
+ct = ct.decode('hex')
+
+pt = encobj.decrypt(ct)
+
+pt =pt[0:[m.start(0) for m in re.finditer("10*$", pt)][0]]
+print "Decrypted Plaintext:",pt
+    
 #print nounList
 #print adjList
 #print verbList

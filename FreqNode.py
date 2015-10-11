@@ -36,14 +36,14 @@ letterCode={'e':00000
 sortedFreq= sorted(letterFreq.items(), key=operator.itemgetter(1))
 
 def genEncoding():
-    print sortedFreq
+    #print sortedFreq
     fn = freqNode('a',12)
     #freqNodes =[]
     freqNodes = [freqNode(sortedFreq[i][0],sortedFreq[i][1]) for i in range(0,len(sortedFreq))]
     hTree =genTree(freqNodes)
-    print hTree.freq
+    #print hTree.freq
 
-    printTree(hTree, "")
+    #printTree(hTree, "")
     return hTree
     ##print freqNodes
 
@@ -63,7 +63,7 @@ def genTree(freqList):
         return freqList[0]
     node1 = freqList[0]
     node2= freqList[1]
-    print node1,node2
+    #print node1,node2
     newFreq = node1.freq+node2.freq
     fn = freqNode('!', newFreq)
     fn.addChildren(node1,node2)
